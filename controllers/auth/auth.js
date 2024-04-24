@@ -101,12 +101,18 @@ const refreshToken = async (req, res) => {
     if (type === "socket") {
       ({ accessToken, newRefreshToken } = await generateRefreshTokens(
         refresh_token,
-        process.env.REFRESH_SOCKET_TOKEN_SECRET
+        process.env.REFRESH_SOCKET_TOKEN_SECRET,
+        process.env.REFRESH_SOCKET_TOKEN_EXPIRY,
+        process.env.SOCKET_TOKEN_SECRET,
+        process.env.SOCKET_TOKEN_EXPIRY
       ));
     } else if (type === "app") {
       ({ accessToken, newRefreshToken } = await generateRefreshTokens(
         refresh_token,
-        process.env.REFRESH_TOKEN_SECRET
+        process.env.REFRESH_TOKEN_SECRET,
+        process.env.REFRESH_SOCKET_TOKEN_EXPIRY,
+        process.env.JWT_SECRET,
+        process.env.ACCESS_TOKEN_EXPIRY
       ));
     }
 
@@ -121,25 +127,31 @@ const refreshToken = async (req, res) => {
   }
 };
 
-async function generateRefreshTokens(token, secret) {
+async function generateRefreshTokens(
+  token,
+  refresh_secret,
+  refresh_expiry,
+  access_secret,
+  access_expiry
+) {
   try {
-    const payload = jwt.verify(token, secret);
+    const payload = jwt.verify(token, refresh_secret);
     const user = await User.findById(payload.userId);
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
-    const accessToken = await jwt.sign(
+    const accessToken = await jwt.sign({ userId: user.id }, access_secret, {
+      expiresIn: access_expiry,
+    });
+
+    const newRefreshToken = await jwt.sign(
       { userId: user.id },
-      process.env.SOCKET_TOCKEN_SECRET,
+      refresh_secret,
       {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+        expiresIn: refresh_expiry,
       }
     );
-
-    const newRefreshToken = await jwt.sign({ userId: user.id }, secret, {
-      expiresIn: process.env.REFRESH_SOCKET_TOKEN_EXPIRY,
-    });
 
     return { accessToken, newRefreshToken };
   } catch (error) {
