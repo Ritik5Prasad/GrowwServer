@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Groww Clone
+  contact: {}
+  version: '0.1'
+servers:
+- url: http://localhost:3000
+  variables: {}
+paths:
+  /auth/register:
+    post:
+      tags:
+      - auth
+      summary: Register a user
+      operationId: Registerauser
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/RegisterauserRequest'
+              - example:
+                  name: Ritik
+                  email: ritik4@gmail.com
+                  password: '12345678'
+            example:
+              name: Ritik
+              email: ritik4@gmail.com
+              password: '12345678'
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /auth/login:
+    post:
+      tags:
+      - auth
+      summary: Login
+      operationId: Login
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/LoginRequest'
+              - example:
+                  email: ritik4@gmail.com
+                  password: '12345678'
+            example:
+              email: ritik4@gmail.com
+              password: '12345678'
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /stocks:
+    get:
+      tags:
+      - stocks
+      summary: Get Stocks
+      operationId: GetStocks
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+components:
+  schemas:
+    RegisterauserRequest:
+      title: RegisterauserRequest
+      required:
+      - name
+      - email
+      - password
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        name: Ritik
+        email: ritik4@gmail.com
+        password: '12345678'
+    LoginRequest:
+      title: LoginRequest
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: ritik4@gmail.com
+        password: '12345678'
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+security:
+- httpBearer: []
+tags:
+- name: auth
+  description: ''
+- name: stocks
+  description: ''
