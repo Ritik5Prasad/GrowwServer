@@ -1,3 +1,13 @@
+<a href="https://www.youtube.com/@RitikPrasad-lz8fk">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./rp_banner.jpeg" />
+    <source media="(prefers-color-scheme: light)" srcset="./rp_banner.jpeg" />
+    <img alt="VisionCamera" src="./rp_banner.jpeg" />
+  </picture>
+</a>
+
+
+
 <div align="center">
    <img src="https://resources.groww.in/web-assets/img/website-logo/groww-logo-light.svg"/>
   <h3 align="center">Packed with Node JS, Express and Mongo DB</h3>
