@@ -1,9 +1,12 @@
 <div align="center">
-  <h1 align="center">Groww Server</h1>
+   <img src="https://resources.groww.in/web-assets/img/website-logo/groww-logo-light.svg"/>
   <h3 align="center">Packed with Node JS, Express and Mongo DB</h3>
+   <img src="https://skillicons.dev/icons?i=nodejs,express,mongo,aws"/>
 </div>
 
+
 Welcome to the Groww Server repository! This Node.js application serves as the backend for the Groww Clone project. Below, you'll find instructions on how to set up the development environment and configure necessary variables using the `.env` file.
+
 
 ## Installation
 
@@ -11,21 +14,21 @@ Before you begin, make sure you have Node.js and npm installed on your system. Y
 
 1. Clone this repository to your local machine:
 
-   \`\`\`bash
+```sh
    git clone https://github.com/Ritik5Prasad/GrowwServer.git
-   \`\`\`
+```
 
 2. Navigate to the project directory:
 
-   \`\`\`bash
+```sh
    cd groww-server
-   \`\`\`
+ ```
 
 3. Rename the `env_template` file to `.env`:
 
-   \`\`\`bash
+```sh
    mv env_template .env
-   \`\`\`
+  ```
 
 ## Configuration
 
@@ -36,10 +39,10 @@ Open the `.env` file in your favorite text editor and fill in the required detai
 
 Once you have configured the `.env` file, you can start the server by running:
 
-\`\`\`bash
+```sh
 npm install
 npm start
-\`\`\`
+```
 
 This will install the necessary dependencies and start the server on the specified port.
 
