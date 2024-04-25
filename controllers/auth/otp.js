@@ -76,6 +76,10 @@ const sendOtp = async (req, res) => {
 
   const user = await User.findOne({ email });
 
+  if(!user){
+    throw new BadRequestError("User not found");
+  }
+
   if (otp_type == "email" && user) {
     throw new BadRequestError("User already exist");
   }
