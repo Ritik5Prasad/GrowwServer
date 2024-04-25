@@ -1,7 +1,11 @@
 const User = require("../../models/User");
 const { StatusCodes } = require("http-status-codes");
 const jwt = require("jsonwebtoken");
-const { BadRequestError, NotFoundError, UnauthenticatedError } = require("../../errors");
+const {
+  BadRequestError,
+  NotFoundError,
+  UnauthenticatedError,
+} = require("../../errors");
 const bcrypt = require("bcryptjs");
 
 const updateProfile = async (req, res) => {
@@ -39,16 +43,19 @@ const setLoginPinFirst = async (req, res) => {
   const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
   const userId = decodedToken.userId;
   const user = await User.findById(userId);
+
   if (!user) {
     throw new BadRequestError("User not found");
   }
   if (user.login_pin) {
     throw new BadRequestError("Login PIN Exist! use reset pin");
   }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPin = await bcrypt.hash(login_pin, salt);
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,
-    { login_pin },
+    { login_pin: hashedPin },
     {
       new: true,
       runValidators: true,
@@ -57,7 +64,7 @@ const setLoginPinFirst = async (req, res) => {
 
   const access_token = await jwt.sign(
     { userId: userId },
-    process.env.SOCKET_TOCKEN_SECRET,
+    process.env.SOCKET_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
@@ -70,12 +77,11 @@ const setLoginPinFirst = async (req, res) => {
       expiresIn: process.env.REFRESH_SOCKET_TOKEN_EXPIRY,
     }
   );
-
   res.status(StatusCodes.OK).json({
     success: true,
     socket_tokens: {
-      access_socket_token: access_token,
-      refresh_socket_token: refresh_token,
+      socket_access_token: access_token,
+      socket_refresh_token: refresh_token,
     },
   });
 };
@@ -96,7 +102,7 @@ const verifyPin = async (req, res) => {
     throw new BadRequestError("Set your PIN First");
   }
 
-  const isVerifyingPin = await user.comparePIN(user,login_pin);
+  const isVerifyingPin = await user.comparePIN(user, login_pin);
 
   if (!isVerifyingPin) {
     let message;
@@ -118,7 +124,7 @@ const verifyPin = async (req, res) => {
 
   const access_token = await jwt.sign(
     { userId: userId },
-    process.env.SOCKET_TOCKEN_SECRET,
+    process.env.SOCKET_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
@@ -135,9 +141,36 @@ const verifyPin = async (req, res) => {
   res.status(StatusCodes.OK).json({
     success: true,
     socket_tokens: {
-      access_socket_token: access_token,
-      refresh_socket_token: refresh_token,
+      socket_access_token: access_token,
+      socket_refresh_token: refresh_token,
     },
+  });
+};
+
+const getProfile = async (req, res) => {
+  const accessToken = req.headers.authorization?.split(" ")[1];
+
+  const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
+  const userId = decodedToken.userId;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+  let pinExist = false;
+  let phoneExist = false;
+  if (user.login_pin) {
+    pinExist = true;
+  }
+  if (user.phone_number) {
+    phoneExist = true;
+  }
+  res.status(StatusCodes.OK).json({
+    userId: user.id,
+    email: user.email,
+    phone_exist: phoneExist,
+    name: user.name,
+    login_pin_exist: pinExist,
   });
 };
 
@@ -145,4 +178,5 @@ module.exports = {
   updateProfile,
   setLoginPinFirst,
   verifyPin,
+  getProfile,
 };

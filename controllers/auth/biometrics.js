@@ -52,14 +52,14 @@ const verifyBiometric = async (req, res) => {
     user.id,
     user.biometricKey
   );
- 
+
   if (!isVerifyingSignature) {
     throw new UnauthenticatedError("Invalid Signature");
   }
 
   const access_token = await jwt.sign(
     { userId: userId },
-    process.env.SOCKET_TOCKEN_SECRET,
+    process.env.SOCKET_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
@@ -76,8 +76,8 @@ const verifyBiometric = async (req, res) => {
   res.status(StatusCodes.OK).json({
     success: true,
     socket_tokens: {
-      access_socket_token: access_token,
-      refresh_socket_token: refresh_token,
+      socket_access_token: access_token,
+      socket_refresh_token: refresh_token,
     },
   });
 

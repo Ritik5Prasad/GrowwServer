@@ -94,7 +94,10 @@ UserSchema.statics.updatePIN = async function (email, newPin) {
     const salt = await bcrypt.genSalt(10);
     const hashedPIN = await bcrypt.hash(newPin, salt);
 
-    await this.findOneAndUpdate({ email }, { login_pin: hashedPIN });
+    await this.findOneAndUpdate(
+      { email },
+      { login_pin: hashedPIN, blocked_until_pin: null, wrong_pin_attempts: 0 }
+    );
 
     return { success: true, message: "PIN updated successfully" };
   } catch (error) {
@@ -175,9 +178,7 @@ UserSchema.methods.comparePIN = async function comparePIN(
     userDocument.blocked_until_pin &&
     userDocument.blocked_until_pin > new Date()
   ) {
-    throw new UnauthenticatedError(
-      "Invalid Login attempts exceeded. Please try after 30 minutes."
-    );
+    throw new UnauthenticatedError("Limit Exceeded,try after 30 minutes.");
   }
 
   const hashedPIN = userDocument.login_pin;

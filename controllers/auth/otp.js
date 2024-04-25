@@ -76,7 +76,7 @@ const sendOtp = async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if(!user){
+  if (!user && otp_type == "phone") {
     throw new BadRequestError("User not found");
   }
 

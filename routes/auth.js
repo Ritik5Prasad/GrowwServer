@@ -14,6 +14,7 @@ const {
   updateProfile,
   setLoginPinFirst,
   verifyPin,
+  getProfile,
 } = require("../controllers/auth/user");
 const { signInWithOauth } = require("../controllers/auth/oauth");
 const {
@@ -26,11 +27,13 @@ router.post("/register", register);
 router.post("/oauth", signInWithOauth);
 router.post("/login", login);
 
-
 router.post("/verify-otp", verifyOtp);
 router.post("/send-otp", sendOtp);
 
-router.put("/profile", authenticateUser, updateProfile);
+router
+  .route("/profile")
+  .get(authenticateUser, getProfile)
+  .put(authenticateUser, updateProfile);
 router.post("/set-pin", authenticateUser, setLoginPinFirst);
 router.post("/verify-pin", authenticateUser, verifyPin);
 router.post("/upload-biometric", authenticateUser, uploadBiometric);
