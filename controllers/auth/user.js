@@ -102,7 +102,7 @@ const verifyPin = async (req, res) => {
     throw new BadRequestError("Set your PIN First");
   }
 
-  const isVerifyingPin = await user.comparePIN(user, login_pin);
+  const isVerifyingPin = await user.comparePIN(login_pin);
 
   if (!isVerifyingPin) {
     let message;

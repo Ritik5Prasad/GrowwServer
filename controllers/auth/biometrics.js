@@ -73,16 +73,16 @@ const verifyBiometric = async (req, res) => {
     }
   );
 
+  user.blocked_until_pin = null;
+  user.wrong_pin_attempts = 0;
+  user.save();
+
   res.status(StatusCodes.OK).json({
     success: true,
     socket_tokens: {
       socket_access_token: access_token,
       socket_refresh_token: refresh_token,
     },
-  });
-
-  res.status(StatusCodes.OK).json({
-    msg: "Key Uploaded Successfully",
   });
 };
 

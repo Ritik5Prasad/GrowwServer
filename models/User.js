@@ -122,7 +122,14 @@ UserSchema.statics.updatePassword = async function (email, newPassword) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    await this.findOneAndUpdate({ email }, { password: hashedPassword });
+    await this.findOneAndUpdate(
+      { email },
+      {
+        password: hashedPassword,
+        blocked_until_password: null,
+        wrong_password_attempts: 0,
+      }
+    );
 
     return { success: true, message: "Password updated successfully" };
   } catch (error) {
@@ -170,33 +177,27 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return isMatch;
 };
 
-UserSchema.methods.comparePIN = async function comparePIN(
-  userDocument,
-  candidatePIN
-) {
-  if (
-    userDocument.blocked_until_pin &&
-    userDocument.blocked_until_pin > new Date()
-  ) {
+UserSchema.methods.comparePIN = async function comparePIN(candidatePIN) {
+  if (this.blocked_until_pin && this.blocked_until_pin > new Date()) {
     throw new UnauthenticatedError("Limit Exceeded,try after 30 minutes.");
   }
 
-  const hashedPIN = userDocument.login_pin;
+  const hashedPIN = this.login_pin;
 
   const isMatch = await bcrypt.compare(candidatePIN, hashedPIN);
 
   if (!isMatch) {
-    userDocument.wrong_pin_attempts += 1;
-    if (userDocument.wrong_pin_attempts >= 3) {
+    this.wrong_pin_attempts += 1;
+    if (this.wrong_pin_attempts > 3) {
       const blockDuration = 30 * 60 * 1000;
-      userDocument.blocked_until_pin = new Date(Date.now() + blockDuration);
-      userDocument.wrong_pin_attempts = 0;
+      this.blocked_until_pin = new Date(Date.now() + blockDuration);
+      this.wrong_pin_attempts = 0;
     }
-    await userDocument.save();
+    await this.save();
   } else {
-    userDocument.wrong_pin_attempts = 0;
-    userDocument.blocked_until_pin = null;
-    await userDocument.save();
+    this.wrong_pin_attempts = 0;
+    this.blocked_until_pin = null;
+    await this.save();
   }
 
   return isMatch;
