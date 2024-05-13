@@ -1,10 +1,10 @@
-require('dotenv').config();
+require("dotenv").config();
 require("express-async-errors");
 
 // Swagger
-const swaggerUI = require('swagger-ui-express');
-const YAML = require('yamljs');
-const swaggerDocument = YAML.load('./docs/swagger.yaml');
+const swaggerUI = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDocument = YAML.load("./docs/swagger.yaml");
 
 const express = require("express");
 const connectDB = require("./config/connect");
@@ -13,19 +13,19 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 
 const app = express();
 app.use(express.json());
-const authenticateUser = require("./middleware/authentication");
+const authenticateSocketUser = require("./middleware/socketAuth");
 
 app.get("/", (req, res) => {
   res.send('<h1>Groww Clone API</h1><a href="/api-docs">Documentation</a>');
 });
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // routers
 const authRouter = require("./routes/auth");
 const stockRouter = require("./routes/stocks");
 
 app.use("/auth", authRouter);
-app.use("/stocks", authenticateUser, stockRouter);
+app.use("/stocks", authenticateSocketUser, stockRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
