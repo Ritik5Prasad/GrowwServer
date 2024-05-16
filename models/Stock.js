@@ -23,8 +23,12 @@ const StockSchema = new mongoose.Schema({
     required: true,
   },
   dayTimeSeries: {
-    type: Object,
-    default: {},
+    type: [Object],
+    default: [],
+  },
+  tenMinTimeSeries: {
+    type: [Object],
+    default: [],
   },
 });
 
