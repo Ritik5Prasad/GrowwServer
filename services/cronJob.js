@@ -53,7 +53,7 @@ const update10minCandle = () => {
 
 const generateRandomDataEvery5Second = () => {
   cron.schedule("*/5 * * * * *", async () => {
-    if (!isTradingHour()) {
+    if (isTradingHour()) {
       const stock = await Stock.find();
       stock.forEach(async (s) => {
         await generateStockData(s.symbol);

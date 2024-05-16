@@ -67,7 +67,7 @@ io.on("connection", (socket) => {
 
     const intervalId = setInterval(sendUpdates, 5000);
 
-    if (isTradingHour()) {
+    if (!isTradingHour()) {
       clearInterval(intervalId);
     }
   });
