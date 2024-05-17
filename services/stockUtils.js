@@ -18,15 +18,21 @@ const generateStockData = async (symbol) => {
   const changePercentage =
     (Math.random() * (maxChange - minChange) + minChange) / 100;
   const close = roundToTwoDecimals(currentPrice * (1 + changePercentage));
-  const high = roundToTwoDecimals(Math.max(currentPrice, close) + (Math.random() * 5 - 2.5));
-  const low = roundToTwoDecimals(Math.min(currentPrice, close) - (Math.random() * 5 - 2.5));
+  const high = roundToTwoDecimals(
+    Math.max(currentPrice, close) + (Math.random() * 8 - 2.5)
+  );
+  const low = roundToTwoDecimals(
+    Math.min(currentPrice, close) - (Math.random() * 8 - 2.5)
+  );
   const timestamp = now.toISOString();
-
+  const time = now.getTime() / 1000;
   const lastItem = stock.dayTimeSeries[stock.dayTimeSeries.length - 1];
   if (!lastItem || now - new Date(lastItem.timestamp) > 1 * 60 * 1000) {
     // If last item is older than 3 minutes or there's no item yet, push a new item
     stock.dayTimeSeries.push({
       timestamp,
+      time,
+      _internal_originalTime: time,
       open: roundToTwoDecimals(currentPrice),
       high,
       low,
@@ -34,9 +40,16 @@ const generateStockData = async (symbol) => {
     });
   } else {
     // Update the last item
-    lastItem.high = high;
-    lastItem.low = low;
-    lastItem.close = close;
+    const updateCandle = {
+      high: lastItem.high,
+      low: lastItem.low,
+      close: close,
+      open: lastItem.open,
+      timestamp: lastItem.timestamp,
+      time: lastItem.time,
+      _internal_originalTime: lastItem._internal_originalTime,
+    };
+    stock.dayTimeSeries[stock.dayTimeSeries.length - 1] = updateCandle;
   }
 
   // Keep only 6.5 hours (390 minutes) of 1-minute candles
