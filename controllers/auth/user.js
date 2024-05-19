@@ -171,6 +171,7 @@ const getProfile = async (req, res) => {
     phone_exist: phoneExist,
     name: user.name,
     login_pin_exist: pinExist,
+    balance: user.balance.toFixed(2),
   });
 };
 

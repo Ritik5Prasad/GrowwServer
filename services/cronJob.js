@@ -8,7 +8,11 @@ const isTradingHour = () => {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 (Sunday) to 6 (Saturday)
   const isWeekday = dayOfWeek > 0 && dayOfWeek < 6; // Monday to Friday
-  const isTradingTime = now.getHours() >= 9 && now.getHours() < 15; // 9:30 AM to 3:30 PM
+  const isTradingTime =
+    (now.getHours() === 9 && now.getMinutes() >= 30) ||
+    (now.getHours() > 9 && now.getHours() < 15) ||
+    (now.getHours() === 15 && now.getMinutes() <= 30);
+  // 9:30 AM to 3:30 PM
   const today = new Date().toISOString().slice(0, 10);
   return isWeekday && isTradingTime && !holidays.includes(today);
 };
@@ -45,7 +49,6 @@ const update10minCandle = () => {
       const stock = await Stock.find();
       stock.forEach(async (s) => {
         await store10Min(s.symbol);
-        console.log("10 min candle updated");
       });
     }
   });
@@ -57,7 +60,6 @@ const generateRandomDataEvery5Second = () => {
       const stock = await Stock.find();
       stock.forEach(async (s) => {
         await generateStockData(s.symbol);
-        console.log("Realtime Updates");
       });
     }
   });

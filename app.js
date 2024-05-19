@@ -28,7 +28,10 @@ const isTradingHour = () => {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 (Sunday) to 6 (Saturday)
   const isWeekday = dayOfWeek > 0 && dayOfWeek < 6; // Monday to Friday
-  const isTradingTime = now.getHours() >= 9 && now.getHours() < 15; // 9:30 AM to 3:30 PM
+  const isTradingTime =
+    (now.getHours() === 9 && now.getMinutes() >= 30) ||
+    (now.getHours() === 15 && now.getMinutes() <= 30);
+  // 9:30 AM to 3:30 PM
   const today = new Date().toISOString().slice(0, 10);
   return isWeekday && isTradingTime && !holidays.includes(today);
 };
@@ -47,18 +50,40 @@ io.use(socketHandshake);
 io.on("connection", (socket) => {
   console.log("A client connected");
 
-  socket.on("subscribeToStocks", async (stocks) => {
-    console.log("Client subscribed to stocks:", stocks);
+  socket.on("subscribeToStocks", async (stockSymbol) => {
+    console.log("Client subscribed to stockSymbol:", stockSymbol);
     const sendUpdates = async () => {
       try {
-        for (const stockSymbol of stocks) {
-          const stock = await Stock.findOne({ symbol: stockSymbol });
-          if (!stock) {
-            console.log(`Stock '${stockSymbol}' not found`);
-          } else {
-            socket.emit("stockData", stock);
-          }
+        const stock = await Stock.findOne({ symbol: stockSymbol });
+        if (!stock) {
+          console.log(`Stock '${stockSymbol}' not found`);
+        } else {
+          socket.emit(`${stockSymbol}`, stock);
         }
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+      }
+    };
+    sendUpdates();
+
+    const intervalId = setInterval(sendUpdates, 5000);
+
+    if (!isTradingHour()) {
+      clearInterval(intervalId);
+    }
+  });
+
+  socket.on("subscribeToMultipleStocks", async (stockSymbols) => {
+    console.log("Client subscribed to multiple stocks:", stockSymbols);
+    const sendUpdates = async () => {
+      try {
+        const stocks = await Stock.find({ symbol: { $in: stockSymbols } });
+        const stockData = stocks.map((stock) => ({
+          symbol: stock.symbol,
+          currentPrice: stock.currentPrice,
+          lastDayTradedPrice: stock.lastDayTradedPrice,
+        }));
+        socket.emit("multipleStocksData", stockData);
       } catch (error) {
         console.error("Error fetching stock data:", error);
       }

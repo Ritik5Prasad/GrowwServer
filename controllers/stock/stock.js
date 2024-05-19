@@ -1,7 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../../errors");
+const { BadRequestError, NotFoundError } = require("../../errors");
 const Stock = require("../../models/Stock");
-const jwt = require("jsonwebtoken");
 
 const registerStock = async (req, res) => {
   const { symbol, companyName, iconUrl, lastDayTradedPrice, currentPrice } =
@@ -53,7 +52,28 @@ const getAllStocks = async (req, res) => {
   }
 };
 
+const getStockBySymbol = async (req, res) => {
+  const { stock: symbol } = req.query;
+  if (!symbol) {
+    throw new BadRequestError("Stock symbol is required");
+  }
+
+  try {
+    const stock = await Stock.findOne({ symbol });
+    if (!stock) {
+      throw new NotFoundError("Stock not found");
+    }
+    res.status(StatusCodes.OK).json({
+      msg: "Stock retrieved successfully!",
+      data: stock,
+    });
+  } catch (error) {
+    throw new BadRequestError("Failed to retrieve stock. " + error.message);
+  }
+};
+
 module.exports = {
   registerStock,
   getAllStocks,
+  getStockBySymbol,
 };

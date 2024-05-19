@@ -114,7 +114,10 @@ const getAllHoldings = async (req, res) => {
   const userId = decodedToken.userId;
 
   try {
-    const holdings = await Holding.find({ user: userId }).populate("stock");
+    const holdings = await Holding.find({ user: userId }).populate({
+      path: "stock",
+      select: "-dayTimeSeries -tenMinTimeSeries",
+    });
     res.status(StatusCodes.OK).json({
       msg: "Holdings retrieved successfully!",
       data: holdings,
