@@ -36,7 +36,6 @@ const isTradingHour = () => {
   const today = new Date().toISOString().slice(0, 10);
 
   const isTradingHour = isWeekday && isTradingTime && !holidays.includes(today);
-  console.log("Is Trading Hour:", isTradingHour);
 
   return isTradingHour;
 };
