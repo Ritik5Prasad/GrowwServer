@@ -30,6 +30,7 @@ const isTradingHour = () => {
   const isWeekday = dayOfWeek > 0 && dayOfWeek < 6; // Monday to Friday
   const isTradingTime =
     (now.getHours() === 9 && now.getMinutes() >= 30) ||
+    (now.getHours() > 9 && now.getHours() < 15) ||
     (now.getHours() === 15 && now.getMinutes() <= 30);
   // 9:30 AM to 3:30 PM
   const today = new Date().toISOString().slice(0, 10);
