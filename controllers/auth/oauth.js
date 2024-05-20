@@ -49,11 +49,12 @@ const signInWithOauth = async (req, res) => {
       ({ email } = ticket.getPayload());
     }
 
-    user = await User.findOneAndUpdate(
-      { email: email },
-      { email_verified: true },
-      { upsert: true, new: true }
-    );
+    if (!user) {
+      user = await User.create({ email, email_verified: true });
+    } else {
+      user.email_verified = true;
+      await user.save();
+    }
 
     const accessToken = user.createAccessToken();
     const refreshToken = user.createRefreshToken();
@@ -71,7 +72,7 @@ const signInWithOauth = async (req, res) => {
       user: {
         name: user.name,
         userId: user.id,
-        email:user.email,
+        email: user.email,
         phone_exist,
         login_pin_exist,
       },

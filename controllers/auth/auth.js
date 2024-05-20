@@ -32,6 +32,7 @@ const register = async (req, res) => {
       tokens: { access_token: access_token, refresh_token: refresh_token },
     });
   } catch (error) {
+    console.log("@@@",error)
     throw new BadRequestError("Invalid Body");
   }
 };

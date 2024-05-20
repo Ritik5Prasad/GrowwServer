@@ -3,12 +3,9 @@ const { StatusCodes } = require("http-status-codes");
 const {
   BadRequestError,
   UnauthenticatedError,
-  NotFoundError,
 } = require("../../errors");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const NodeRSA = require("node-rsa");
-const bufferFrom = require("buffer-from");
 
 const uploadBiometric = async (req, res) => {
   const { public_key } = req.body;

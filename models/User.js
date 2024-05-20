@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema(
         "Please provide a 10-digit phone number without spaces or special characters",
       ],
       unique: true,
+      sparse: true, 
     },
     date_of_birth: Date,
     biometricKey: String,

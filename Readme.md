@@ -34,7 +34,7 @@ Before you begin, make sure you have Node.js and npm installed on your system. Y
    cd groww-server
  ```
 
-3. Rename the `env_template` file to `.env`:
+3. Rename the `env_template` according to your need local or prod file to `.env`:
 
 ```sh
    mv env_template .env
