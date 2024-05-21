@@ -28,16 +28,18 @@ const isNewTradeDay = () => {
 const scheduleDayReset = () => {
   cron.schedule("15 9 * * 1-5", async () => {
     if (isNewTradeDay()) {
-      await Stock.updateMany(
-        {},
+      await Stock.updateMany({}, [
         {
           $set: {
             dayTimeSeries: [],
             tenMinTimeSeries: [],
-            lastDayTradedPrice: { $set: "$currentPrice" },
+            lastDayTradedPrice: "$currentPrice",
           },
-        }
-      );
+        },
+        {
+          $set: { __v: 0 },
+        },
+      ]);
       console.log("Day reset completed at 9:15 AM");
     }
   });
