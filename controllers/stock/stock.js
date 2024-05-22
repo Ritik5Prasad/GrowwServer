@@ -42,7 +42,9 @@ const registerStock = async (req, res) => {
 
 const getAllStocks = async (req, res) => {
   try {
-    const stocks = await Stock.find();
+    const stocks = await Stock.find().select(
+      "-dayTimeSeries -tenMinTimeSeries"
+    );
     res.status(StatusCodes.OK).json({
       msg: "Stocks retrieved successfully!",
       data: stocks,
